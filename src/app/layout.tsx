@@ -12,7 +12,7 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Friends Zone | Ecosystem",
+  title: "Friends Zone",
   description: "Ecosystem for Builders",
 };
 

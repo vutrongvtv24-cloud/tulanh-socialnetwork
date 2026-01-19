@@ -121,7 +121,7 @@ export function SidebarRight() {
                                 </Link>
 
                                 <div className="flex items-center gap-2 shrink-0">
-                                    <span className="font-bold text-primary text-xs hidden sm:inline-block">{leader.xp + (leader.level * 100)} pts</span>
+                                    <span className="font-bold text-primary text-xs hidden sm:inline-block">{leader.xp + (leader.level * 100)} XP</span>
 
                                     {leader.id !== authUser?.id && (
                                         <Link href={`/messages?userId=${leader.id}`} title={`Message ${leader.full_name}`}>
