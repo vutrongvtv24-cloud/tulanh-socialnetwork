@@ -12,6 +12,8 @@ type GamificationContextType = {
     xpProgress: number; // percentage 0-100
     badges: typeof MOCK_USER.badges;
     showXpGain: (amount: number, reason: string) => void;
+    profileName: string;
+    avatarUrl: string;
 };
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -21,6 +23,8 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     const [xp, setXp] = useState(0);
     const [badges, setBadges] = useState(MOCK_USER.badges);
     const [userId, setUserId] = useState<string | null>(null);
+    const [profileName, setProfileName] = useState("Builder User");
+    const [avatarUrl, setAvatarUrl] = useState("");
     const previousXp = useRef<number>(0);
     const previousLevel = useRef<number>(1);
 
@@ -41,13 +45,15 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
 
                 const { data: profile } = await supabase
                     .from('profiles')
-                    .select('level, xp')
+                    .select('level, xp, full_name, avatar_url')
                     .eq('id', session.user.id)
                     .single();
 
                 if (profile) {
                     setLevel(profile.level || 1);
                     setXp(profile.xp || 0);
+                    setProfileName(profile.full_name || session.user.user_metadata?.full_name || "Builder User");
+                    setAvatarUrl(profile.avatar_url || session.user.user_metadata?.avatar_url || "");
                     previousXp.current = profile.xp || 0;
                     previousLevel.current = profile.level || 1;
                 }
@@ -68,7 +74,7 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
                 table: 'profiles',
                 filter: `id=eq.${userId}`
             }, (payload) => {
-                const newProfile = payload.new as { xp: number; level: number };
+                const newProfile = payload.new as { xp: number; level: number; full_name?: string; avatar_url?: string };
 
                 // Calculate XP gained
                 const xpGained = newProfile.xp - previousXp.current;
@@ -77,6 +83,8 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
                 // Update state
                 setXp(newProfile.xp);
                 setLevel(newProfile.level);
+                if (newProfile.full_name) setProfileName(newProfile.full_name);
+                if (newProfile.avatar_url) setAvatarUrl(newProfile.avatar_url);
 
                 // Show XP toast if XP increased
                 if (xpGained > 0) {
@@ -150,7 +158,9 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
             xpToNextLevel,
             xpProgress,
             badges,
-            showXpGain
+            showXpGain,
+            profileName,
+            avatarUrl
         }}>
             {children}
             {/* XP Toast overlay */}

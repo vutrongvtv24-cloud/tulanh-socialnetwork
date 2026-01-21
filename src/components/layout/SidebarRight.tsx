@@ -13,14 +13,14 @@ import { RankBadge, RankBadgeInline } from "@/components/gamification/RankBadge"
 import { getRankByLevel } from "@/config/ranks";
 
 export function SidebarRight() {
-    const { level, xp, badges, xpToNextLevel } = useGamification();
+    const { level, xp, badges, xpToNextLevel, profileName, avatarUrl } = useGamification();
     const { user: authUser } = useSupabaseAuth();
     const { leaders, loading: loadingLeaderboard } = useLeaderboard();
 
-    // Use session user if available, otherwise fallback to Guest
+    // Use profile data from GamificationContext (synced with database)
     const user = authUser ? {
-        name: authUser.user_metadata.full_name || "Builder User",
-        avatar: authUser.user_metadata.avatar_url || "",
+        name: profileName || "Builder User",
+        avatar: avatarUrl || "",
         title: "Member",
     } : {
         name: "Guest",
