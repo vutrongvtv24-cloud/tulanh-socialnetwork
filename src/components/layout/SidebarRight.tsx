@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,15 +8,28 @@ import { useGamification } from "@/context/GamificationContext";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useLeaderboard } from "@/hooks/useLeaderboard";
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, CalendarCheck, ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { RankBadge, RankBadgeInline } from "@/components/gamification/RankBadge";
-import { getRankByLevel } from "@/config/ranks";
+import { getRankByLevel, GAMIFICATION_RULES } from "@/config/ranks";
+import { toast } from "sonner";
 
 export function SidebarRight() {
-    const { level, xp, badges, xpToNextLevel, profileName, avatarUrl } = useGamification();
+    const { level, xp, badges, xpToNextLevel, profileName, avatarUrl, performDailyCheckin, hasCheckedInToday, imagePostLimit } = useGamification();
     const { user: authUser } = useSupabaseAuth();
     const { leaders, loading: loadingLeaderboard } = useLeaderboard();
+    const [isCheckingIn, setIsCheckingIn] = useState(false);
+
+    const handleCheckin = async () => {
+        setIsCheckingIn(true);
+        const result = await performDailyCheckin();
+        if (result.success) {
+            toast.success(result.message);
+        } else {
+            toast.info(result.message);
+        }
+        setIsCheckingIn(false);
+    };
 
     // Use profile data from GamificationContext (synced with database)
     const user = authUser ? {
@@ -68,9 +82,31 @@ export function SidebarRight() {
                             </div>
                         </div>
                         <p className="text-[10px] text-muted-foreground text-center">
-                            {level < 5 ? `${xpToNextLevel - xp} XP đến Level ${level + 1}` : '🏆 Đã đạt cấp cao nhất!'}
+                            {level < 5 ? `${xpToNextLevel} XP đến Level ${level + 1}` : '🏆 Đã đạt cấp cao nhất!'}
                         </p>
                     </div>
+
+                    {/* Daily Check-in Button */}
+                    {authUser && (
+                        <div className="mt-4 space-y-2">
+                            <Button
+                                onClick={handleCheckin}
+                                disabled={hasCheckedInToday || isCheckingIn}
+                                variant={hasCheckedInToday ? "secondary" : "default"}
+                                className="w-full gap-2"
+                                size="sm"
+                            >
+                                <CalendarCheck className="h-4 w-4" />
+                                {hasCheckedInToday ? '✓ Đã điểm danh hôm nay' : 'Điểm danh (+3 XP)'}
+                            </Button>
+
+                            {/* Image Limit Info */}
+                            <div className="flex items-center justify-center gap-1 text-[10px] text-muted-foreground">
+                                <ImageIcon className="h-3 w-3" />
+                                <span>Giới hạn ảnh: {imagePostLimit.description}</span>
+                            </div>
+                        </div>
+                    )}
                 </CardContent>
             </Card>
 

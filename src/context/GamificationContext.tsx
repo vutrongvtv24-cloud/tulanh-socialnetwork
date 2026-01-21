@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback, use
 import { MOCK_USER } from "@/data/mock";
 import { createClient } from "@/lib/supabase/client";
 import { XpToast, useXpToast } from "@/components/gamification/XpToast";
+import { getRankByXp, getXpToNextRank, XP_ACTIONS, getImageLimit } from "@/config/ranks";
 
 type GamificationContextType = {
     level: number;
@@ -14,6 +15,9 @@ type GamificationContextType = {
     showXpGain: (amount: number, reason: string) => void;
     profileName: string;
     avatarUrl: string;
+    performDailyCheckin: () => Promise<{ success: boolean; message: string }>;
+    hasCheckedInToday: boolean;
+    imagePostLimit: { count: number; description: string };
 };
 
 const GamificationContext = createContext<GamificationContextType | undefined>(undefined);
@@ -27,14 +31,19 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
     const [avatarUrl, setAvatarUrl] = useState("");
     const previousXp = useRef<number>(0);
     const previousLevel = useRef<number>(1);
+    const [hasCheckedInToday, setHasCheckedInToday] = useState(false);
 
     const { current: xpToastCurrent, showXpGain, handleComplete } = useXpToast();
 
     const supabase = createClient();
 
-    // XP needed for next level = level * 100 (progressive)
-    const xpToNextLevel = level * 100;
-    const xpProgress = Math.min((xp / xpToNextLevel) * 100, 100);
+    // Calculate XP progress using new rank system
+    const currentRank = getRankByXp(xp);
+    const xpToNextLevel = getXpToNextRank(xp);
+    const xpInCurrentRank = xp - currentRank.minXp;
+    const xpNeededForRank = (currentRank.maxXp === Infinity) ? 1000 : (currentRank.maxXp - currentRank.minXp + 1);
+    const xpProgress = level === 5 ? 100 : Math.min((xpInCurrentRank / xpNeededForRank) * 100, 100);
+    const imagePostLimit = getImageLimit(level);
 
     // Initial Load
     useEffect(() => {
@@ -109,16 +118,48 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
         };
     }, [userId, supabase, showXpGain]);
 
-    // Helper to determine reason based on XP amount
+    // Helper to determine reason based on XP amount (updated for V2)
     const getXpReason = (amount: number): string => {
         switch (amount) {
-            case 10: return "New Post! 📝";
-            case 5: return "Engagement! ❤️";
-            case 3: return "Comment! 💬";
-            case 2: return "Interaction! ⚡";
-            default: return "Activity! ✨";
+            case XP_ACTIONS.CREATE_POST: return "Đăng bài! 📝";
+            case XP_ACTIONS.DAILY_CHECKIN: return "Điểm danh! 📅";
+            case XP_ACTIONS.RECEIVE_COMMENT: return "Nhận Comment! 💬";
+            case XP_ACTIONS.RECEIVE_SHARE: return "Nhận Share! 🔁";
+            case XP_ACTIONS.RECEIVE_LIKE:
+            case XP_ACTIONS.GIVE_COMMENT: return "Tương tác! ⚡";
+            default:
+                if (amount >= 50) return "Bonus Level Up! 🎁";
+                return "Hoạt động! ✨";
         }
     };
+
+    // Daily Check-in Function
+    const performDailyCheckin = useCallback(async () => {
+        const { data, error } = await supabase.rpc('perform_daily_checkin');
+
+        if (error) {
+            return { success: false, message: error.message };
+        }
+
+        if (data?.success) {
+            setHasCheckedInToday(true);
+            showXpGain(XP_ACTIONS.DAILY_CHECKIN, 'Điểm danh! 📅');
+        }
+
+        return { success: data?.success || false, message: data?.message || 'Lỗi không xác định' };
+    }, [supabase, showXpGain]);
+
+    // Check if already checked in today
+    useEffect(() => {
+        if (!userId) return;
+
+        const checkTodayStatus = async () => {
+            const { data } = await supabase.rpc('has_checked_in_today');
+            setHasCheckedInToday(data === true);
+        };
+
+        checkTodayStatus();
+    }, [userId, supabase]);
 
     // Fetch badges
     useEffect(() => {
@@ -160,7 +201,10 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
             badges,
             showXpGain,
             profileName,
-            avatarUrl
+            avatarUrl,
+            performDailyCheckin,
+            hasCheckedInToday,
+            imagePostLimit
         }}>
             {children}
             {/* XP Toast overlay */}
