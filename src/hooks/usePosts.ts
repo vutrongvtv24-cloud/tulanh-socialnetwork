@@ -26,6 +26,12 @@ export type UI_Post = {
     status?: 'approved' | 'pending' | 'rejected';
     title?: string;
     min_level_to_view?: number;
+    community?: {
+        id: string;
+        name: string;
+        slug: string;
+        icon?: string;
+    };
 };
 
 const PAGE_SIZE = 5; // Load 5 posts at a time
@@ -104,6 +110,12 @@ export function usePosts(communitySlug?: string) {
                         avatar_url,
                         role,
                         level
+                    ),
+                    communities (
+                        id,
+                        name,
+                        slug,
+                        icon
                     )
                 `)
                 .order("created_at", { ascending: false })
@@ -114,10 +126,8 @@ export function usePosts(communitySlug?: string) {
             } else if (communitySlug) {
                 // Slug provided but ID not solved (should cause empty return or loading)
                 // Actually handled by early return above.
-            } else {
-                // Global feed shows posts without community
-                query = query.is('community_id', null);
             }
+            // If no community specified, get ALL posts (both global and community posts)
 
             const { data: postsData, error: postsError } = await query;
 
@@ -171,6 +181,12 @@ export function usePosts(communitySlug?: string) {
                     role: string;
                     level: number;
                 } | null;
+                communities: {
+                    id: string;
+                    name: string;
+                    slug: string;
+                    icon?: string;
+                } | null;
             };
 
             const formattedPosts: UI_Post[] = (postsData as unknown as PostWithProfile[]).map((post) => ({
@@ -190,7 +206,13 @@ export function usePosts(communitySlug?: string) {
                 image_url: post.image_url,
                 status: post.status,
                 title: post.title || undefined,
-                min_level_to_view: post.min_level_to_view || 0
+                min_level_to_view: post.min_level_to_view || 0,
+                community: post.communities ? {
+                    id: post.communities.id,
+                    name: post.communities.name,
+                    slug: post.communities.slug,
+                    icon: post.communities.icon || undefined
+                } : undefined
             }));
 
             if (isLoadMore) {
@@ -222,14 +244,14 @@ export function usePosts(communitySlug?: string) {
     // Simplified strategy: Listen for updates to update like/comment counts of visible posts.
     // For new posts, optionally show a "New posts available" button or insert if on page 0.
     useEffect(() => {
+        // Build realtime config - only filter if specific community, else listen to all
+        const channelConfig = communityId
+            ? { event: 'UPDATE' as const, schema: 'public', table: 'posts', filter: `community_id=eq.${communityId}` }
+            : { event: 'UPDATE' as const, schema: 'public', table: 'posts' }; // No filter = all posts
+
         const channel = supabase
-            .channel(`public:posts_realtime:${communityId || 'global'}`)
-            .on('postgres_changes', {
-                event: 'UPDATE', // Only listen for updates (likes/comments changes)
-                schema: 'public',
-                table: 'posts',
-                filter: communityId ? `community_id=eq.${communityId}` : 'community_id=is.null'
-            }, (payload) => {
+            .channel(`public:posts_realtime:${communityId || 'all'}`)
+            .on('postgres_changes', channelConfig, (payload) => {
                 // Update local state if the post exists in our list
                 setPosts(prev => prev.map(p => {
                     if (p.id === payload.new.id) {

@@ -378,8 +378,18 @@ export function PostCard({ post, onToggleLike, onDeletePost, onBlockUser }: Post
                                 </span>
                             )}
                         </Link>
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 flex-wrap">
                             <div className="text-xs text-muted-foreground">{post.time}</div>
+                            {post.community && (
+                                <Link
+                                    href={`/community/${post.community.slug}`}
+                                    className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                >
+                                    {post.community.slug === 'youtube' && '📺'}
+                                    {post.community.slug === 'tricks-courses' && '🎓'}
+                                    {post.community.name}
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
