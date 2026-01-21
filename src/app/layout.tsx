@@ -13,7 +13,7 @@ import { Toaster } from "@/components/ui/sonner";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "My Room",
+  title: "Tủ Lạnh",
   description: "Cộng đồng học tập và phát triển cùng nhau",
 };
 

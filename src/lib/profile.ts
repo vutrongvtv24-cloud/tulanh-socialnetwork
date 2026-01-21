@@ -46,8 +46,10 @@ export async function fetchProfile(userId: string) {
     };
 }
 
+
 /**
  * Update profile name - only allowed once after registration
+ * Admin can change infinitely
  * @returns { success: boolean, error?: string }
  */
 export async function updateProfileName(userId: string, newName: string): Promise<{ success: boolean; error?: string }> {
@@ -65,7 +67,7 @@ export async function updateProfileName(userId: string, newName: string): Promis
     // Check if user has already changed their name
     const { data: profile, error: fetchError } = await supabase
         .from('profiles')
-        .select('name_changed')
+        .select('name_changed, email')
         .eq('id', userId)
         .single();
 
@@ -73,16 +75,21 @@ export async function updateProfileName(userId: string, newName: string): Promis
         return { success: false, error: "Failed to fetch profile" };
     }
 
-    if (profile?.name_changed) {
+    const isAdmin = profile?.email === 'vutrongvtv24@gmail.com';
+
+    // If not admin and already changed, block
+    if (!isAdmin && profile?.name_changed) {
         return { success: false, error: "You have already used your one-time name change" };
     }
 
-    // Update name and mark as changed
+    // Update name and mark as changed (only if not admin)
     const { error: updateError } = await supabase
         .from('profiles')
         .update({
             full_name: newName.trim(),
-            name_changed: true
+            // If admin, keep name_changed as is (or false). If user, set true.
+            // Actually, for simplicity, we can just set true. Admin bypasses the check anyway.
+            name_changed: isAdmin ? profile.name_changed : true
         })
         .eq('id', userId);
 
@@ -101,7 +108,7 @@ export async function canChangeName(userId: string): Promise<boolean> {
 
     const { data: profile, error } = await supabase
         .from('profiles')
-        .select('name_changed')
+        .select('name_changed, email')
         .eq('id', userId)
         .single();
 
@@ -109,6 +116,9 @@ export async function canChangeName(userId: string): Promise<boolean> {
     if (error || !profile) {
         return true;
     }
+
+    const isAdmin = profile?.email === 'vutrongvtv24@gmail.com';
+    if (isAdmin) return true;
 
     // If name_changed is null/undefined/false, allow change
     return profile.name_changed !== true;
@@ -122,7 +132,7 @@ export async function canChangeAvatar(userId: string): Promise<boolean> {
 
     const { data: profile, error } = await supabase
         .from('profiles')
-        .select('avatar_changed')
+        .select('avatar_changed, email')
         .eq('id', userId)
         .single();
 
@@ -130,6 +140,9 @@ export async function canChangeAvatar(userId: string): Promise<boolean> {
     if (error || !profile) {
         return true;
     }
+
+    const isAdmin = profile?.email === 'vutrongvtv24@gmail.com';
+    if (isAdmin) return true;
 
     // If avatar_changed is null/undefined/false, allow change
     return profile.avatar_changed !== true;

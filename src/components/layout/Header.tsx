@@ -38,11 +38,11 @@ export function Header() {
                     <Link href="/" className="group">
                         <span className="font-bold text-xl tracking-tight hidden sm:block relative">
                             <span className="relative z-10 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                                MY ROOM
+                                {t.appName.toUpperCase()}
                             </span>
                             {/* Glow effect */}
-                            <span className="absolute inset-0 blur-lg bg-gradient-to-r from-primary/50 via-purple-500/50 to-pink-500/50 opacity-0 group-hover:opacity-70 transition-opacity duration-300" aria-hidden="true">
-                                MY ROOM
+                            <span className="absolute inset-0 blur-lg bg-gradient-to-r from-primary/50 via-purple-500/50 to-pink-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
+                                {t.appName.toUpperCase()}
                             </span>
                         </span>
                     </Link>

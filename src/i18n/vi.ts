@@ -5,7 +5,7 @@ import type { TranslationKeys } from './en';
 
 export const vi: TranslationKeys = {
     // App
-    appName: "My Room",
+    appName: "Tủ Lạnh",
 
     // Navigation
     nav: {

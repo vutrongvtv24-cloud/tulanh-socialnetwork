@@ -3,7 +3,7 @@
  */
 export const en = {
     // App
-    appName: "My Room",
+    appName: "The Fridge",
 
     // Navigation
     nav: {
