@@ -4,24 +4,28 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: Request) {
-    const { searchParams, origin } = new URL(request.url)
-    const code = searchParams.get('code')
-    // if "next" is in param, use it as the redirect URL
-    const next = searchParams.get('next') ?? '/'
+    const requestUrl = new URL(request.url)
+    const code = requestUrl.searchParams.get('code')
+    const next = requestUrl.searchParams.get('next') ?? '/'
 
     if (code) {
         const supabase = await createClient()
         const { error } = await supabase.auth.exchangeCodeForSession(code)
 
         if (!error) {
-            // Simply redirect to the origin that initiated the request
-            // This works for both localhost and Vercel deployments
-            return NextResponse.redirect(`${origin}${next}`)
+            const forwardedHost = request.headers.get('x-forwarded-host')
+            const isProd = forwardedHost === 'tulanh.online' || requestUrl.host === 'tulanh.online'
+
+            if (isProd) {
+                return NextResponse.redirect(`https://tulanh.online${next}`)
+            }
+
+            return NextResponse.redirect(`${requestUrl.origin}${next}`)
         } else {
             console.error('Auth callback error:', error)
         }
     }
 
     // return the user to an error page with instructions
-    return NextResponse.redirect(`${origin}/auth?error=auth_code_error`)
+    return NextResponse.redirect(`${requestUrl.origin}/auth?error=auth_code_error`)
 }
