@@ -53,7 +53,7 @@ export function useChat() {
                 return;
             }
 
-            const convIds = myParticipations.map(p => p.conversation_id);
+            const convIds = myParticipations.map((p: { conversation_id: string }) => p.conversation_id);
 
             // 2. Get Details of those conversations
             // And specifically, the OTHER participant info
@@ -91,7 +91,7 @@ export function useChat() {
                     ;
 
                 // Alternative: map through convs and fetch limit 1 for each (N+1 but acceptable for < 20 convs)
-                await Promise.all(convIds.map(async (cid) => {
+                await Promise.all(convIds.map(async (cid: string) => {
                     const { data } = await supabase
                         .from('direct_messages')
                         .select('content')
@@ -104,8 +104,12 @@ export function useChat() {
             }
 
             if (convMeta && allParticipants) {
-                const formatted: Conversation[] = convMeta.map(c => {
-                    const other = allParticipants.find(p => p.conversation_id === c.id) as any;
+                const formatted: Conversation[] = convMeta.map((c: { id: string; updated_at: string }) => {
+                    const other = allParticipants.find((p: { conversation_id: string }) => p.conversation_id === c.id) as {
+                        conversation_id: string;
+                        user_id: string;
+                        profiles: { full_name: string; avatar_url: string } | { full_name: string; avatar_url: string }[] | null;
+                    } | undefined;
                     return {
                         id: c.id,
                         updated_at: c.updated_at,
@@ -149,8 +153,8 @@ export function useChat() {
                 schema: 'public',
                 table: 'direct_messages',
                 filter: `conversation_id=eq.${activeConversationId}`
-            }, (payload) => {
-                setMessages(prev => [...prev, payload.new as Message]);
+            }, (payload: { new: Message }) => {
+                setMessages(prev => [...prev, payload.new]);
             })
             .subscribe();
 

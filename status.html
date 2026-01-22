@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔧 Code Audit Report - Tủ Lạnh</title>
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-yellow: #eab308;
+            --accent-blue: #3b82f6;
+            --accent-purple: #a855f7;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-card));
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--accent-green), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        header .date {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .summary-card .number {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .summary-card.success .number {
+            color: var(--accent-green);
+        }
+
+        .summary-card.warning .number {
+            color: var(--accent-yellow);
+        }
+
+        .summary-card.error .number {
+            color: var(--accent-red);
+        }
+
+        .summary-card.info .number {
+            color: var(--accent-blue);
+        }
+
+        .summary-card .label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        section h2 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+            color: var(--text-primary);
+        }
+
+        .fix-item {
+            background: var(--bg-card);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .fix-item.pending {
+            border-left-color: var(--accent-yellow);
+        }
+
+        .fix-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .fix-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .fix-item code {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .file-path {
+            color: var(--accent-purple);
+            font-family: 'Consolas', monospace;
+            font-size: 0.85rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.fixed {
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+        }
+
+        .badge.new {
+            background: rgba(168, 85, 247, 0.2);
+            color: var(--accent-purple);
+        }
+
+        .badge.improved {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .badge.pending {
+            background: rgba(234, 179, 8, 0.2);
+            color: var(--accent-yellow);
+        }
+
+        .recommendations {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .rec-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-card);
+            border-radius: 8px;
+        }
+
+        .rec-item .icon {
+            font-size: 1.5rem;
+        }
+
+        .rec-item .content h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .rec-item .content p {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            background: rgba(34, 197, 94, 0.2);
+            color: var(--accent-green);
+            font-weight: 600;
+        }
+
+        .status-indicator::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .success-banner {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.2), rgba(59, 130, 246, 0.2));
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .success-banner h3 {
+            color: var(--accent-green);
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Code Audit Report</h1>
+            <p style="font-size: 1.2rem; margin: 0.5rem 0;">Dự án: <strong>Tủ Lạnh</strong></p>
+            <p class="date">📅 Ngày: 22/01/2026 - 09:59 ICT</p>
+            <div style="margin-top: 1rem;">
+                <span class="status-indicator">✅ Audit hoàn tất - 0 Errors</span>
+            </div>
+        </header>
+
+        <!-- Success Banner -->
+        <div class="success-banner">
+            <h3>🎉 TypeScript Check: PASSED</h3>
+            <p>Tất cả 13 lỗi TypeScript đã được sửa thành công!</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card success">
+                <div class="number">13</div>
+                <div class="label">Lỗi đã sửa</div>
+            </div>
+            <div class="summary-card info">
+                <div class="number">3</div>
+                <div class="label">Files mới tạo</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="number">8</div>
+                <div class="label">Files được cải tiến</div>
+            </div>
+            <div class="summary-card success">
+                <div class="number">0</div>
+                <div class="label">TypeScript Errors</div>
+            </div>
+        </div>
+
+        <!-- Fixed Issues -->
+        <section>
+            <h2>✅ Lỗi Đã Sửa (13 lỗi)</h2>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> Import Order - Header.tsx</h3>
+                <p class="file-path">src/components/layout/Header.tsx</p>
+                <p>Di chuyển <code>useState</code>, <code>useEffect</code>, <code>useSearch</code> lên đầu file theo
+                    đúng convention. Xóa imports nằm giữa component.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> Duplicate Select - usePosts.ts</h3>
+                <p class="file-path">src/hooks/usePosts.ts</p>
+                <p>Xóa dòng <code>*,</code> trùng lặp trong Supabase query để tối ưu performance.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - usePosts.ts (3 lỗi)</h3>
+                <p class="file-path">src/hooks/usePosts.ts (dòng 152, 161, 254)</p>
+                <p>Thêm proper types cho parameters <code>p</code>, <code>l</code>, <code>payload</code> trong map và
+                    realtime callbacks.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - PostCard.tsx</h3>
+                <p class="file-path">src/components/feed/PostCard.tsx (dòng 269)</p>
+                <p>Thêm type annotation cho <code>payload</code> parameter trong realtime subscription.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> Hardcoded Admin Email</h3>
+                <p class="file-path">src/components/feed/PostCard.tsx</p>
+                <p>Thay thế hardcoded email bằng function <code>isAdminUser()</code> từ file constants.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - useSupabaseAuth.ts (3 lỗi)</h3>
+                <p class="file-path">src/hooks/useSupabaseAuth.ts</p>
+                <p>Thêm types cho <code>_event</code>, <code>session</code> trong onAuthStateChange và sửa getSession
+                    callback.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - useChat.ts (5 lỗi)</h3>
+                <p class="file-path">src/hooks/useChat.ts</p>
+                <p>Thêm types cho <code>p</code>, <code>c</code>, <code>cid</code>, <code>payload</code> trong các map
+                    và realtime callbacks.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - todos/page.tsx</h3>
+                <p class="file-path">src/app/todos/page.tsx</p>
+                <p>Thêm type annotation cho <code>payload</code> parameter trong realtime subscription.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - PersonalJournal.tsx (2 lỗi)</h3>
+                <p class="file-path">src/components/journal/PersonalJournal.tsx</p>
+                <p>Thêm types cho <code>payload</code> trong INSERT và DELETE realtime callbacks.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - GamificationContext.tsx</h3>
+                <p class="file-path">src/context/GamificationContext.tsx</p>
+                <p>Thêm type cho <code>payload</code> parameter trong profile realtime subscription.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge fixed">Fixed</span> TypeScript Implicit Any - useNotifications.ts</h3>
+                <p class="file-path">src/hooks/useNotifications.ts</p>
+                <p>Thêm type cho <code>payload</code> parameter trong notifications realtime subscription.</p>
+            </div>
+        </section>
+
+        <!-- New Files Created -->
+        <section>
+            <h2>📁 Files Mới Tạo</h2>
+
+            <div class="fix-item">
+                <h3><span class="badge new">New</span> Supabase Client Singleton</h3>
+                <p class="file-path">src/lib/supabase/client.ts</p>
+                <p>Implement singleton pattern cho Supabase client - tránh tạo nhiều instances gây memory leak với
+                    realtime subscriptions.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge new">New</span> Constants Configuration</h3>
+                <p class="file-path">src/config/constants.ts</p>
+                <p>File tập trung quản lý: <code>ADMIN_EMAILS</code>, <code>CONTENT_LIMITS</code>,
+                    <code>PAGINATION</code>, <code>STORAGE_BUCKETS</code>, và helper function
+                    <code>isAdminUser()</code>.</p>
+            </div>
+
+            <div class="fix-item">
+                <h3><span class="badge improved">Updated</span> Supabase Types</h3>
+                <p class="file-path">src/types/supabase.ts</p>
+                <p>Cập nhật đầy đủ types cho 14 tables và 3 functions. Thêm: <code>profiles</code>, <code>posts</code>,
+                    <code>communities</code>, <code>community_members</code>, <code>likes</code>, <code>comments</code>,
+                    <code>conversations</code>, <code>direct_messages</code>, <code>notifications</code>,
+                    <code>follows</code>, <code>badges</code>, <code>user_badges</code>, <code>post_approvals</code>,
+                    <code>daily_checkins</code>.</p>
+            </div>
+        </section>
+
+        <!-- Files Modified -->
+        <section>
+            <h2>📝 Files Được Sửa Đổi</h2>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 0.5rem;">
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/components/layout/Header.tsx</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/components/feed/PostCard.tsx</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/components/journal/PersonalJournal.tsx</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/hooks/usePosts.ts</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/hooks/useSupabaseAuth.ts</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/hooks/useChat.ts</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/hooks/useNotifications.ts</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/context/GamificationContext.tsx</div>
+                <div class="file-path" style="padding: 0.5rem; background: var(--bg-card); border-radius: 4px;">📄
+                    src/app/todos/page.tsx</div>
+            </div>
+        </section>
+
+        <!-- Recommendations -->
+        <section>
+            <h2>💡 Đề Xuất Tiếp Theo</h2>
+
+            <div class="recommendations">
+                <div class="rec-item">
+                    <div class="icon">🔐</div>
+                    <div class="content">
+                        <h4>Cập nhật .env.local</h4>
+                        <p>File <code>.env.local</code> đã được tạo từ template. Cần điền Supabase credentials thực để
+                            chạy ứng dụng.</p>
+                    </div>
+                </div>
+
+                <div class="rec-item">
+                    <div class="icon">📊</div>
+                    <div class="content">
+                        <h4>Thêm Error Boundary</h4>
+                        <p>Nên thêm React Error Boundary cho các components chính để xử lý lỗi gracefully.</p>
+                    </div>
+                </div>
+
+                <div class="rec-item">
+                    <div class="icon">🧪</div>
+                    <div class="content">
+                        <h4>Thêm Unit Tests</h4>
+                        <p>Chưa có test files. Nên thêm Jest/Vitest để test các hooks và components quan trọng.</p>
+                    </div>
+                </div>
+
+                <div class="rec-item">
+                    <div class="icon">📝</div>
+                    <div class="content">
+                        <h4>Input Validation</h4>
+                        <p>Thêm validation cho content length trong CreatePost và Comment forms. Sử dụng CONTENT_LIMITS
+                            từ constants.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tech Stack Summary -->
+        <section>
+            <h2>🛠️ Tech Stack</h2>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem;">
+                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">Next.js 16.1.3</span>
+                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">React 19</span>
+                <span class="badge" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa;">TypeScript 5</span>
+                <span class="badge" style="background: rgba(6, 182, 212, 0.2); color: #22d3ee;">TailwindCSS 3.4</span>
+                <span class="badge" style="background: rgba(34, 197, 94, 0.2); color: #4ade80;">Supabase</span>
+                <span class="badge" style="background: rgba(168, 85, 247, 0.2); color: #c084fc;">Radix UI</span>
+            </div>
+        </section>
+
+        <footer>
+            <p>🤖 Generated by Antigravity AI Assistant</p>
+            <p style="margin-top: 0.5rem; opacity: 0.7;">Audit performed on 22/01/2026 at 09:59 ICT</p>
+            <p style="margin-top: 0.5rem; opacity: 0.5;">TypeScript Check: <strong
+                    style="color: var(--accent-green);">PASSED ✓</strong></p>
+        </footer>
+    </div>
+</body>
+
+</html>

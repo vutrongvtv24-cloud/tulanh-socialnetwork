@@ -1,7 +1,7 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { useEffect, useState } from "react";
-import { User, Session } from "@supabase/supabase-js";
+import { User, Session, AuthChangeEvent } from "@supabase/supabase-js";
 
 export function useSupabaseAuth() {
     const [user, setUser] = useState<User | null>(null);
@@ -10,21 +10,25 @@ export function useSupabaseAuth() {
     const supabase = createClient();
 
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (_event: AuthChangeEvent, session: Session | null) => {
+                setSession(session);
+                setUser(session?.user ?? null);
+                setLoading(false);
+            }
+        );
 
         // Initial check
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
+        const initSession = async () => {
+            const { data } = await supabase.auth.getSession();
+            setSession(data.session);
+            setUser(data.session?.user ?? null);
             setLoading(false);
-        });
+        };
+        initSession();
 
         return () => subscription.unsubscribe();
-    }, []);
+    }, [supabase]);
 
     const signInWithGoogle = async () => {
         await supabase.auth.signInWithOAuth({

@@ -102,7 +102,6 @@ export function usePosts(communitySlug?: string) {
                 .from("posts")
                 .select(`
                     *,
-                    *,
                     image_url,
                     title,
                     min_level_to_view,
@@ -150,7 +149,7 @@ export function usePosts(communitySlug?: string) {
             // 2. Check which posts user has liked (if logged in)
             let likedPostIds = new Set<string>();
             if (user) {
-                const postIds = postsData.map(p => p.id);
+                const postIds = postsData.map((p: { id: string }) => p.id);
                 if (postIds.length > 0) {
                     const { data: likesData } = await supabase
                         .from("likes")
@@ -159,7 +158,7 @@ export function usePosts(communitySlug?: string) {
                         .eq("user_id", user.id);
 
                     if (likesData) {
-                        likesData.forEach(l => likedPostIds.add(l.post_id));
+                        likesData.forEach((l: { post_id: string }) => likedPostIds.add(l.post_id));
                     }
                 }
             }
@@ -252,15 +251,14 @@ export function usePosts(communitySlug?: string) {
 
         const channel = supabase
             .channel(`public:posts_realtime:${communityId || 'all'}`)
-            .on('postgres_changes', channelConfig, (payload) => {
+            .on('postgres_changes', channelConfig, (payload: { new: { id: string; likes_count: number; comments_count: number } }) => {
                 // Update local state if the post exists in our list
                 setPosts(prev => prev.map(p => {
                     if (p.id === payload.new.id) {
-                        const newPost = payload.new as any;
                         return {
                             ...p,
-                            likes: newPost.likes_count,
-                            comments: newPost.comments_count
+                            likes: payload.new.likes_count,
+                            comments: payload.new.comments_count
                         };
                     }
                     return p;

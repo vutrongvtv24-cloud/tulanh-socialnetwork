@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Search, Bell, Menu, LogIn, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -7,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useLanguage } from "@/context/LanguageContext";
+import { useSearch } from "@/hooks/useSearch";
 import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
     DropdownMenu,
@@ -129,8 +131,6 @@ export function Header() {
     )
 }
 
-import { useSearch } from "@/hooks/useSearch";
-
 function SearchLogic() {
     const { query, setQuery, results, loading } = useSearch();
     const [open, setOpen] = useState(false);
@@ -177,5 +177,3 @@ function SearchLogic() {
         </div>
     );
 }
-
-import { useState, useEffect } from "react";

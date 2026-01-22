@@ -23,6 +23,7 @@ import remarkGfm from 'remark-gfm';
 import { toast } from "sonner";
 import { useGamification } from "@/context/GamificationContext";
 import { MarkdownEditor } from "@/components/ui/markdown-editor";
+import { isAdminUser } from "@/config/constants";
 
 interface PostCardProps {
     post: UI_Post;
@@ -63,7 +64,7 @@ export function PostCard({ post, onToggleLike, onDeletePost, onBlockUser }: Post
     const [postStatus, setPostStatus] = useState(post.status || 'approved');
 
     const supabase = createClient();
-    const isAdmin = user?.email === 'vutrongvtv24@gmail.com';
+    const isAdmin = isAdminUser(user?.email);
     const { level } = useGamification();
     const { t, language } = useLanguage();
 
@@ -265,13 +266,13 @@ export function PostCard({ post, onToggleLike, onDeletePost, onBlockUser }: Post
                     table: 'comments',
                     filter: `post_id=eq.${post.id}`
                 },
-                async (payload) => {
+                async (payload: { new: { id: string; content: string; created_at: string; user_id: string } }) => {
                     // Update counter regardless
                     setLocalCommentsCount(prev => prev + 1);
 
                     // If comments are open, we need to fetch user details for the new comment
                     if (showComments) {
-                        const newComment = payload.new as { id: string, content: string, created_at: string, user_id: string };
+                        const newComment = payload.new;
 
                         // Fetch profile for the new comment
                         const { data: profile } = await supabase

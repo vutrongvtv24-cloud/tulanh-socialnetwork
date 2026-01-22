@@ -98,16 +98,16 @@ export function PersonalJournal() {
                 schema: 'public',
                 table: 'journal_entries',
                 filter: `user_id=eq.${user.id}`
-            }, (payload) => {
-                setEntries(prev => [payload.new as JournalEntry, ...prev]);
+            }, (payload: { new: JournalEntry }) => {
+                setEntries(prev => [payload.new, ...prev]);
             })
             .on('postgres_changes', {
                 event: 'DELETE',
                 schema: 'public',
                 table: 'journal_entries',
                 filter: `user_id=eq.${user.id}`
-            }, (payload) => {
-                setEntries(prev => prev.filter(e => e.id !== (payload.old as JournalEntry).id));
+            }, (payload: { old: JournalEntry }) => {
+                setEntries(prev => prev.filter(e => e.id !== payload.old.id));
             })
             .subscribe();
 

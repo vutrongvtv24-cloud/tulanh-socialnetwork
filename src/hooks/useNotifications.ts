@@ -58,7 +58,7 @@ export function useNotifications() {
                     table: 'notifications',
                     filter: `user_id=eq.${user.id}`,
                 },
-                (payload) => {
+                (payload: { new: Notification }) => {
                     // Fetch new notification details (need actor info) or assume simplified
                     fetchNotifications();
                 }

@@ -54,13 +54,13 @@ export default function TodosPage() {
                 schema: 'public',
                 table: 'todos',
                 filter: `user_id=eq.${user.id}`
-            }, (payload) => {
+            }, (payload: { eventType: string; new: Todo; old: Todo }) => {
                 if (payload.eventType === 'INSERT') {
-                    setTodos(prev => [payload.new as Todo, ...prev]);
+                    setTodos(prev => [payload.new, ...prev]);
                 } else if (payload.eventType === 'UPDATE') {
-                    setTodos(prev => prev.map(t => t.id === (payload.new as Todo).id ? payload.new as Todo : t));
+                    setTodos(prev => prev.map(t => t.id === payload.new.id ? payload.new : t));
                 } else if (payload.eventType === 'DELETE') {
-                    setTodos(prev => prev.filter(t => t.id !== (payload.old as Todo).id));
+                    setTodos(prev => prev.filter(t => t.id !== payload.old.id));
                 }
             })
             .subscribe();
@@ -201,8 +201,8 @@ export default function TodosPage() {
                             <div
                                 key={todo.id}
                                 className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${todo.completed
-                                        ? 'bg-green-500/5 border-green-500/20'
-                                        : 'bg-card hover:bg-secondary/50'
+                                    ? 'bg-green-500/5 border-green-500/20'
+                                    : 'bg-card hover:bg-secondary/50'
                                     }`}
                             >
                                 <button

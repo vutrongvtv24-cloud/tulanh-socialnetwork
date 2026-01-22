@@ -82,8 +82,8 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
                 schema: 'public',
                 table: 'profiles',
                 filter: `id=eq.${userId}`
-            }, (payload) => {
-                const newProfile = payload.new as { xp: number; level: number; full_name?: string; avatar_url?: string };
+            }, (payload: { new: { xp: number; level: number; full_name?: string; avatar_url?: string } }) => {
+                const newProfile = payload.new;
 
                 // Calculate XP gained
                 const xpGained = newProfile.xp - previousXp.current;
