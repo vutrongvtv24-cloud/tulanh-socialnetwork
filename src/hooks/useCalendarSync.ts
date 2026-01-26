@@ -12,18 +12,8 @@ export const useCalendarSync = () => {
 
     const syncToCalendar = async (todo: { content: string, date?: Date }) => {
         if (!session?.provider_token) {
-            // If we don't have a provider token (because we didn't ask for scopes or login type is different),
-            // we might not actully be able to client-side sync easily without a backend proxy or proper scope handling.
-            // However, Supabase stores generation tokens.
-            // Let's assume for this MVP we just start the flow.
-
-            // Actually, Supabase exposes `provider_token` in the session ONLY if it was just created or refreshed correctly.
-            // Checking session...
-            console.log("Session for Calendar:", session);
-        }
-
-        if (!session || session.user.app_metadata.provider !== 'google') {
-            toast.error('Vui lòng đăng nhập bằng Google để sử dụng tính năng này');
+            console.warn("Missing provider_token. Session:", session);
+            toast.error('Không tìm thấy quyền truy cập Google Calendar. Vui lòng đăng xuất và đăng nhập lại.');
             return;
         }
 
@@ -51,16 +41,18 @@ export const useCalendarSync = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to sync to Google Calendar');
+                const errorData = await response.json();
+                console.error("Google API Error:", errorData);
+                throw new Error(errorData.error?.message || 'Failed to sync to Google Calendar');
             }
 
             const data = await response.json();
             toast.success('Đã đồng bộ công việc lên Google Calendar!');
             setSyncedEvents(prev => [...prev, data]);
             return data;
-        } catch (error) {
+        } catch (error: any) {
             console.error('Calendar sync error:', error);
-            toast.error('Lỗi đồng bộ lịch. Vui lòng thử lại sau.');
+            toast.error(`Lỗi đồng bộ: ${error.message}`);
         } finally {
             setIsSyncing(false);
         }
