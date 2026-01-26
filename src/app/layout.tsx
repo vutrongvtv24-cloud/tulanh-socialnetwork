@@ -5,7 +5,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Header } from "@/components/layout/Header";
 import { SidebarLeft } from "@/components/layout/SidebarLeft";
-import { SidebarRight } from "@/components/layout/SidebarRight";
+import { RightSidebarWrapper } from "@/components/layout/RightSidebarWrapper";
 import { GamificationProvider } from "@/context/GamificationContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { Toaster } from "@/components/ui/sonner";
@@ -45,7 +45,7 @@ export default function RootLayout({
                   </main>
 
                   <aside className="hidden xl:block w-[320px] shrink-0 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto pb-8">
-                    <SidebarRight />
+                    <RightSidebarWrapper />
                   </aside>
                 </div>
                 <Toaster />
