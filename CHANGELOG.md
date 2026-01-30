@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
 - **Critical Migration:** Đã chạy migration `20260127_add_topic_to_posts.sql` trên Production. Tính năng Topic Filter giờ đã hoạt động 100%.
 - **Data Integrity:** Chuẩn hóa dữ liệu cũ của cột `topic` thành default value (`'share'`).
 - **Notes Page Bug:** Fixed infinite rendering loop caused by `loading` in useEffect dependencies.
+- **Notes Layout:** Fixed content overlap with Leaderboard sidebar (changed `max-w-4xl` → `max-w-3xl`).
+- **Notes Wording:** Updated từ "ghi chú" thành "kiến thức" across entire module.
 
 ### Updated
 - **Dependencies:** Nâng cấp Next.js lên 16.1.3, React 19.2.3.

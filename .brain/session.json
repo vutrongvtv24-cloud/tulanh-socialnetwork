@@ -1,9 +1,9 @@
 {
-    "updated_at": "2026-01-30T12:40:00+07:00",
+    "updated_at": "2026-01-30T14:26:00+07:00",
     "working_on": {
         "feature": "Tủ Lạnh (MarkNote) Module",
-        "task": "COMPLETE - Saved to Brain",
-        "status": "complete",
+        "task": "READY FOR DEPLOY - Pending git push",
+        "status": "deploy_pending",
         "files": [
             "supabase/migrations/20260130_create_notes_tables.sql",
             "src/types/notes.ts",
@@ -15,13 +15,13 @@
             "src/components/notes/TagTree.tsx",
             "src/components/layout/SidebarLeft.tsx"
         ],
-        "notes": "🎉 TỦ LẠNH MODULE HOÀN THÀNH! 7/7 phases. Bug fixed: infinite loop resolved. Route: /notes"
+        "notes": "🎉 TỦ LẠNH HOÀN THÀNH! Wording: kiến thức. Layout fixed. Route: /notes. Commit ready."
     },
     "pending_tasks": [
         {
-            "task": "Deploy Tủ Lạnh to Production",
+            "task": "Git push và deploy lên VPS",
             "priority": "high",
-            "notes": "Run /deploy to push changes"
+            "notes": "Commit đã sẵn sàng, chờ approve và push"
         },
         {
             "task": "Refine Classroom/Courses Feature",
@@ -36,11 +36,21 @@
     ],
     "recent_changes": [
         {
-            "timestamp": "2026-01-30T12:10:00+07:00",
-            "type": "bugfix",
-            "description": "Fixed infinite rendering loop in Notes page - removed loading from useEffect deps",
+            "timestamp": "2026-01-30T14:12:00+07:00",
+            "type": "ui-fix",
+            "description": "Fixed layout overlap with Leaderboard - changed max-w-4xl to max-w-3xl",
             "files": [
                 "src/app/notes/page.tsx"
+            ]
+        },
+        {
+            "timestamp": "2026-01-30T14:04:00+07:00",
+            "type": "wording",
+            "description": "Changed all 'ghi chú' to 'kiến thức' across Notes module",
+            "files": [
+                "src/app/notes/page.tsx",
+                "src/components/notes/NoteCard.tsx",
+                "src/components/notes/NoteEditor.tsx"
             ]
         },
         {
