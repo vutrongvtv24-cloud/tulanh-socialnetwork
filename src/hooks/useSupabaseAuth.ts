@@ -50,7 +50,7 @@ export function useSupabaseAuth() {
     }, [supabase]);
 
     const signInWithGoogle = async () => {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin;
+        const baseUrl = 'https://tulanh.online';
         await supabase.auth.signInWithOAuth({
             provider: 'google',
             options: {

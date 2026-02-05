@@ -10,8 +10,8 @@ let supabaseClient: ReturnType<typeof createBrowserClient> | null = null;
 export function createClient() {
   if (!supabaseClient) {
     supabaseClient = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+      'https://uoqyotwurkyjdrawqbpe.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVvcXlvdHd1cmt5amRyYXdxYnBlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg3NjUzOTksImV4cCI6MjA4NDM0MTM5OX0.brBwR5Xb4GclhbieaSS3dC9G6D3MnWWQQtCU9WWtYPk'
     );
   }
   return supabaseClient;

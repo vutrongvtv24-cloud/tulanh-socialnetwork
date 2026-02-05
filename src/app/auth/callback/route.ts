@@ -9,9 +9,8 @@ export async function GET(request: Request) {
     const next = requestUrl.searchParams.get('next') ?? '/'
 
     // Use NEXT_PUBLIC_SITE_URL to prevent localhost redirect when behind proxy
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.NODE_ENV === 'production'
-        ? 'https://tulanh.online'
-        : requestUrl.origin
+    // Use NEXT_PUBLIC_SITE_URL to prevent localhost redirect when behind proxy
+    const siteUrl = 'https://tulanh.online';
 
     if (code) {
         const supabase = await createClient()
