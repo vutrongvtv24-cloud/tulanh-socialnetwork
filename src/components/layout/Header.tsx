@@ -37,16 +37,22 @@ export function Header() {
                     <Button variant="ghost" size="icon" className="lg:hidden">
                         <Menu className="h-5 w-5" />
                     </Button>
-                    <Link href="/" className="group">
-                        <span className="font-bold text-xl tracking-tight hidden sm:block relative">
-                            <span className="relative z-10 bg-gradient-to-r from-primary via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                                {t.appName.toUpperCase()}
+                    <Link href="/" className="group flex items-center gap-3">
+                        {/* Logo Container with Glow Effect */}
+                        <div className="relative flex items-center gap-2 filter drop-shadow-[0_0_8px_rgba(56,189,248,0.6)] group-hover:drop-shadow-[0_0_15px_rgba(56,189,248,0.9)] transition-all duration-300">
+                            {/* Text */}
+                            <span className="font-bold text-2xl tracking-tight text-foreground hidden sm:block font-sans">
+                                THE Fridge
                             </span>
-                            {/* Glow effect */}
-                            <span className="absolute inset-0 blur-lg bg-gradient-to-r from-primary/50 via-purple-500/50 to-pink-500/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true">
-                                {t.appName.toUpperCase()}
-                            </span>
-                        </span>
+                            {/* Icon - Placed AFTER text as requested */}
+                            <div className="relative h-10 w-auto aspect-[355/582]">
+                                <img
+                                    src="/images/fridge-logo.png"
+                                    alt="Fridge Logo"
+                                    className="h-full w-auto object-contain"
+                                />
+                            </div>
+                        </div>
                     </Link>
                 </div>
 
