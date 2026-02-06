@@ -9,7 +9,6 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useLanguage } from "@/context/LanguageContext";
 import { useSearch } from "@/hooks/useSearch";
-import { LanguageSelector } from "@/components/i18n/LanguageSelector";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -99,8 +98,7 @@ export function Header() {
                         </PopoverContent>
                     </Popover>
 
-                    {/* Language Selector */}
-                    <LanguageSelector variant="icon" size="sm" />
+
 
                     {user ? (
                         <DropdownMenu>
