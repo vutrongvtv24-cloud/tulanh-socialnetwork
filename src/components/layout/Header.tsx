@@ -41,7 +41,7 @@ export function Header() {
                         <div className="relative flex items-center gap-2 filter drop-shadow-[0_0_8px_rgba(56,189,248,0.6)] group-hover:drop-shadow-[0_0_15px_rgba(56,189,248,0.9)] transition-all duration-300">
                             {/* Text */}
                             <span className="font-bold text-2xl tracking-tight text-foreground hidden sm:block font-sans [-webkit-text-stroke:1px_#f97316] drop-shadow-[0_0_2px_rgba(249,115,22,0.8)]">
-                                The FRIDGE
+                                Tủ lạnh
                             </span>
                             {/* Icon - Placed AFTER text as requested */}
                             <div className="relative h-10 w-auto aspect-[355/582]">

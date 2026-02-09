@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { toast } from "sonner";
 import { useLanguage } from "@/context/LanguageContext";
-import { LanguageCards } from "@/components/i18n/LanguageSelector";
+
 
 export default function AuthPage() {
     const { signInWithGoogle } = useSupabaseAuth();
@@ -22,13 +22,11 @@ export default function AuthPage() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-[calc(100vh-4rem)] p-4 bg-muted/20 gap-8">
-            <div className="w-full max-w-4xl">
-                <LanguageCards onSelect={(lang) => setLanguage(lang)} />
-            </div>
+
 
             <Card className="w-full max-w-md shadow-lg">
                 <CardHeader className="text-center space-y-4 pb-8">
-                    <CardTitle className="text-3xl font-extrabold tracking-tight">{t.auth.welcome}</CardTitle>
+                    <CardTitle className="text-3xl font-extrabold tracking-tight">Chào mừng Bro đến với Tủ lạnh !</CardTitle>
                     <CardDescription className="text-base">
                         {t.auth.description}
                     </CardDescription>
