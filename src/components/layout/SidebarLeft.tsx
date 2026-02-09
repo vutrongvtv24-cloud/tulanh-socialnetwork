@@ -85,21 +85,7 @@ export function SidebarLeft() {
                 </Button>
             </div>
 
-            <div>
-                <Button
-                    variant="ghost"
-                    className={`w-full justify-start font-medium transition-all duration-200 ${isActive("/courses")
-                        ? "bg-primary/20 text-primary-foreground border-l-4 border-primary rounded-r-full"
-                        : "text-muted-foreground hover:text-foreground hover:bg-white/10"
-                        }`}
-                    asChild
-                >
-                    <Link href="/courses">
-                        <BookOpen className={`mr-2 h-4 w-4 ${isActive("/courses") ? "text-primary-foreground" : "text-muted-foreground group-hover:text-foreground"}`} />
-                        {t.nav.courses}
-                    </Link>
-                </Button>
-            </div>
+
 
 
 

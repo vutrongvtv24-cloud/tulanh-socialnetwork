@@ -157,20 +157,23 @@ function SearchLogic() {
                 onBlur={() => { setTimeout(() => setOpen(false), 200) }} // Delay to allow click on result
             />
 
-            {open && results.length > 0 && (
-                <div className="absolute top-10 left-0 w-full bg-popover border rounded-md shadow-md z-50 overflow-hidden">
-                    {loading && <div className="p-2 text-xs text-muted-foreground">Searching...</div>}
+            {open && (results.length > 0 || loading || (query.length > 0 && !loading)) && (
+                <div className="absolute top-10 left-0 w-full bg-popover border rounded-md shadow-md z-50 overflow-hidden min-h-[40px]">
+                    {loading && <div className="p-2 text-xs text-muted-foreground flex justify-center">Searching...</div>}
+                    {!loading && results.length === 0 && query.length > 0 && (
+                        <div className="p-3 text-xs text-muted-foreground text-center">No results found.</div>
+                    )}
                     {results.map((r) => (
-                        <Link key={r.type + r.id} href={r.url} className="block p-2 hover:bg-accent flex items-center gap-2 cursor-pointer transition-colors">
+                        <Link key={r.type + r.id} href={r.url} className="block p-2 hover:bg-accent flex items-center gap-2 cursor-pointer transition-colors border-b last:border-0">
                             {r.type === 'profile' ? (
-                                <Avatar className="h-6 w-6">
+                                <Avatar className="h-8 w-8">
                                     <AvatarImage src={r.avatar} />
                                     <AvatarFallback>U</AvatarFallback>
                                 </Avatar>
                             ) : (
-                                <div className="h-6 w-6 flex items-center justify-center bg-secondary rounded-full text-[10px]">📝</div>
+                                <div className="h-8 w-8 flex items-center justify-center bg-secondary rounded-full text-sm">📝</div>
                             )}
-                            <div className="overflow-hidden">
+                            <div className="overflow-hidden flex-1">
                                 <div className="text-sm font-medium truncate">{r.title}</div>
                                 {r.subtitle && <div className="text-[10px] text-muted-foreground truncate">{r.subtitle}</div>}
                             </div>
