@@ -44,7 +44,9 @@ export function PostHeader({ post, isAuthor, isAdmin, onEdit, onDelete, onBlockU
                         )}
                     </Link>
                     <div className="flex items-center gap-2 flex-wrap">
-                        <div className="text-xs text-muted-foreground">{post.time}</div>
+                        <Link href={`/post/${post.id}`} className="text-xs text-muted-foreground hover:underline">
+                            {post.time}
+                        </Link>
                         {post.community && (
                             <Link
                                 href={`/community/${post.community.slug}`}

@@ -2,36 +2,33 @@
 📋 HANDOVER DOCUMENT
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📍 Đang làm: Stability & Deployment
-🔢 Đến bước: Deployment Verification
+📍 Đang làm: Social Sharing & Post Details
+🔢 Đến bước: Completed Deployment
 
 ✅ ĐÃ XONG:
-   - Fix lỗi loading icon bị treo (Feed, Journal) ✓
-   - Fix infinite scroll logic ✓
-   - Thêm timeout/error handling cho auth hooks ✓
-   - Deploy code lên VPS (43.228.214.174) qua PM2 ✓
-   - Tạo biến môi trường .env.local trên VPS ✓
+   - Phase 01: Tạo trang chi tiết bài viết (Server-Side Rendered) tại `/post/[id]`
+   - Phase 02: Tích hợp nút Share Facebook + Copy Link vào Clipboard
+   - Phase 03: Fix lỗi UX/Interaction (preventDefault, stopPropagation)
+   - Phase 04: Deploy lên VPS và verify code hoạt động
 
-⏳ CÒN LẠI (Next Steps):
-   - Cấu hình Nginx làm Reverse Proxy (port 80 -> 3000)
-   - Setup SSL (HTTPS) cho domain tulanh.online
-   - Trỏ DNS domain về IP 43.228.214.174
+⏳ CÒN LẠI:
+   - Kiểm tra lại Auth Flow trên domain thật (lỗi `pkce_code_verifier_not_found` có thể do cookie cũ hoặc SSL)
+   - Cấu hình Domain chính thức & SSL (Let's Encrypt/Nginx)
 
 🔧 QUYẾT ĐỊNH QUAN TRỌNG:
-   - Dùng PM2 để quản lý process Next.js
-   - Chạy trực tiếp port 3000 (hiện tại)
-   - Bắt buộc phải có .env.local chứa Supabase URL/Key thì app mới không crash
+   - Dùng SSR cho trang chi tiết (`/post/[id]`) để đảm bảo Metadata khi share lên Facebook hiển thị đẹp.
+   - Nút Share sẽ ưu tiên Copy Link + Báo Toast trước khi mở Popup (tránh bị chặn).
+   - Timestamp bài viết giờ là link dẫn vào chi tiết bài.
 
 ⚠️ LƯU Ý CHO SESSION SAU:
-   - Website đang chạy HTTP tại http://43.228.214.174:3000
-   - Nếu gặp lỗi "Invalid API Key" trong log cũ là bình thường, check status mới nhất
-   - Cần cấu hình Domain sớm để dùng Google Auth (callback URL)
+   - Nếu lỗi Share không hiện popup, hãy check Console log.
+   - Nếu lỗi Login `pkce...`, hãy thử Xóa Cache/Cookies hoặc check lại `NEXT_PUBLIC_SITE_URL` trên VPS.
+   - VPS cần chạy `pm2 restart tulanh --update-env` nếu đổi biến môi trường.
 
 📁 FILES QUAN TRỌNG:
-   - .env.local (chứa secrets)
-   - src/components/journal/PersonalJournal.tsx (logic loading đã sửa)
-   - src/hooks/useSupabaseAuth.ts (auth logic đã sửa)
-   - CHANGELOG.md (lịch sử cập nhật)
+   - `src/app/post/[id]/page.tsx` (Logic SSR Post)
+   - `src/components/feed/post-card/PostActions.tsx` (Logic Share Button)
+   - `.brain/brain.json` (Project Architecture)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📍 Đã lưu! Để tiếp tục: Gõ /recap

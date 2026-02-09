@@ -370,6 +370,7 @@ export function PostCard({ post, onToggleLike, onDeletePost, onBlockUser }: Post
                     isLiked={post.liked_by_user}
                     onToggleLike={() => onToggleLike(post.id, post.liked_by_user)}
                     onToggleComments={() => setShowComments(!showComments)}
+                    postId={post.id}
                 />
 
                 {showComments && (
